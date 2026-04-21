@@ -11,7 +11,7 @@
     "start": "npm run dev",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --env-file=.env.test --test src/lib/*.test.js src/features/**/*.test.js api/*.test.js",
+    "test": "node --env-file-if-exists=.env.test --test src/lib/*.test.js src/features/**/*.test.js api/*.test.js",
     "test:e2e": "playwright test",
     "validate:env": "node scripts/validate-env.js",
     "validate:migrations": "node scripts/validate-migrations.js",
