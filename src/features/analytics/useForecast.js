@@ -81,7 +81,7 @@ export function useForecast(userId, selectedYear, selectedMonth) {
         console.error('adjustForecast:', err);
       }
     },
-    [userId, selectedYear, selectedMonth, forecastQuery.data, adjustForecastMutation]
+    [selectedYear, selectedMonth, forecastQuery.data, adjustForecastMutation]
   );
 
   return {

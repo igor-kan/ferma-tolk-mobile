@@ -40,19 +40,23 @@ const AddEntry = () => {
     date: new Date().toISOString().split('T')[0],
   });
 
-  useEffect(() => {
-    if (formData.type === 'income' && formData.projectId === 'all_projects') {
-      const firstValid = projects.find((p) => p.id !== 'all_projects');
-      if (firstValid) setFormData((prev) => ({ ...prev, projectId: firstValid.id }));
-    }
-  }, [formData.type, formData.projectId, projects]);
+  const firstProjectForIncome =
+    projects.find((project) => project.id !== 'all_projects')?.id || 'all_projects';
 
-  useEffect(() => {
-    if (parsedData?.type === 'income' && parsedData?.projectId === 'all_projects') {
-      const firstValid = projects.find((p) => p.id !== 'all_projects');
-      if (firstValid) setParsedData((prev) => ({ ...prev, projectId: firstValid.id }));
+  const normalizeProjectIdForType = (type, projectId) => {
+    if (type !== 'income') {
+      return projectId || 'all_projects';
     }
-  }, [parsedData?.type, parsedData?.projectId, projects]);
+    if (projectId && projectId !== 'all_projects') {
+      return projectId;
+    }
+    return firstProjectForIncome;
+  };
+
+  const normalizedFormProjectId = normalizeProjectIdForType(formData.type, formData.projectId);
+  const normalizedParsedProjectId = parsedData
+    ? normalizeProjectIdForType(parsedData.type, parsedData.projectId)
+    : 'all_projects';
 
   const transcriptRef = useRef('');
   const litersInputRef = useRef(null);
@@ -192,7 +196,12 @@ const AddEntry = () => {
   };
 
   const handleApprove = () => {
-    addTransaction(parsedData);
+    if (!parsedData) return;
+
+    addTransaction({
+      ...parsedData,
+      projectId: normalizedParsedProjectId,
+    });
     setRecordingStep(6);
     setTimeout(() => resetVoiceFlow(), 2000);
   };
@@ -203,6 +212,7 @@ const AddEntry = () => {
 
     const validation = validateTransaction({
       ...formData,
+      projectId: normalizedFormProjectId,
       amount: formData.amount,
       liters: formData.liters || null,
       date: formData.date ? new Date(formData.date).toISOString() : undefined,
@@ -231,6 +241,7 @@ const AddEntry = () => {
         amount: '',
         liters: '',
         description: '',
+        projectId: projects[0]?.id || 'all_projects',
         date: new Date().toISOString().split('T')[0],
       });
     }, 2000);
@@ -633,7 +644,7 @@ const AddEntry = () => {
                     {t('projects', language)}
                   </label>
                   <select
-                    value={parsedData.projectId}
+                    value={normalizedParsedProjectId}
                     onChange={(e) => setParsedData({ ...parsedData, projectId: e.target.value })}
                     style={{
                       width: '100%',
@@ -748,7 +759,23 @@ const AddEntry = () => {
             <label>Type</label>
             <select
               value={formData.type}
-              onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+              onChange={(e) => {
+                const nextType = e.target.value;
+                setFormData({
+                  ...formData,
+                  type: nextType,
+                  category:
+                    nextType === 'income'
+                      ? formData.category === 'opex' || formData.category === 'capex'
+                        ? 'operationalRevenue'
+                        : formData.category
+                      : formData.category === 'operationalRevenue' ||
+                          formData.category === 'otherIncome'
+                        ? 'opex'
+                        : formData.category,
+                  projectId: normalizeProjectIdForType(nextType, formData.projectId),
+                });
+              }}
               style={{ width: '100%', padding: '12px' }}
             >
               <option value="expense">{t('expense', language)}</option>
@@ -778,7 +805,7 @@ const AddEntry = () => {
           <div style={{ marginBottom: '1rem' }}>
             <label>{t('projects', language)}</label>
             <select
-              value={formData.projectId}
+              value={normalizedFormProjectId}
               onChange={(e) => setFormData({ ...formData, projectId: e.target.value })}
               style={{
                 width: '100%',

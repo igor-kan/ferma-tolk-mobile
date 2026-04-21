@@ -21,5 +21,7 @@ Maintain and evolve `ferma-tolk-mobile` as the mobile distribution repository fo
 
 - Web build passes.
 - Capacitor sync works.
+- Android debug APK build succeeds (`npm run mobile:android:debug:apk`).
+- iOS dependencies resolve (`cd ios/App && pod install`).
 - Android/iOS projects remain generation-compatible.
 - Documentation reflects current architecture and commands.

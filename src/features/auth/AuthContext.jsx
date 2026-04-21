@@ -31,7 +31,9 @@
  */
 
 import { createContext, useContext, useState, useEffect } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { supabase } from '../../shared/api/supabase';
+import { MOBILE_AUTH_REDIRECT_URL } from '../../lib/config.js';
 import {
   logSignInSuccess,
   logSignInFailure,
@@ -43,6 +45,21 @@ import {
 } from '../../lib/security-log';
 
 const AuthContext = createContext();
+const DEFAULT_NATIVE_RECOVERY_REDIRECT = 'fermatolk://auth#recovery';
+
+function getWebRecoveryRedirect() {
+  if (typeof window === 'undefined') {
+    return DEFAULT_NATIVE_RECOVERY_REDIRECT;
+  }
+  return `${window.location.origin}${window.location.pathname}#recovery`;
+}
+
+function getPasswordResetRedirect() {
+  if (Capacitor.isNativePlatform()) {
+    return MOBILE_AUTH_REDIRECT_URL || DEFAULT_NATIVE_RECOVERY_REDIRECT;
+  }
+  return getWebRecoveryRedirect();
+}
 
 export const AuthProvider = ({ children }) => {
   // session: the full Supabase Session object (contains user, access_token, etc.)
@@ -160,7 +177,7 @@ export const AuthProvider = ({ children }) => {
    * Supabase Dashboard → Authentication → URL Configuration.
    */
   const sendPasswordReset = async (email) => {
-    const redirectTo = `${window.location.origin}${window.location.pathname}#recovery`;
+    const redirectTo = getPasswordResetRedirect();
     const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
     if (error) {
       logPasswordReset('error', error.message);

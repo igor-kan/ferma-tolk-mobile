@@ -1,0 +1,89 @@
+name: Mobile Native Build
+
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+    branches: [main, staging]
+  workflow_dispatch:
+
+jobs:
+  android-debug:
+    name: Android Debug APK
+    runs-on: ubuntu-latest
+    env:
+      VITE_SUPABASE_URL: https://test.supabase.co
+      VITE_SUPABASE_ANON_KEY: test-anon-key-placeholder
+      VITE_APP_ENV: development
+      VITE_API_BASE_URL: https://ferma-tolk.youridea.live
+      VITE_MOBILE_AUTH_REDIRECT_URL: fermatolk://auth#recovery
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Android SDK packages
+        run: |
+          export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
+          yes | sdkmanager --licenses
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+      - name: Build web assets
+        run: npm run build
+      - name: Sync Android shell
+        run: npx cap sync android
+      - name: Build debug APK
+        run: npm run mobile:android:debug:apk
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ferma-tolk-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+
+  ios-simulator:
+    name: iOS Simulator Build
+    runs-on: macos-latest
+    env:
+      VITE_SUPABASE_URL: https://test.supabase.co
+      VITE_SUPABASE_ANON_KEY: test-anon-key-placeholder
+      VITE_APP_ENV: development
+      VITE_API_BASE_URL: https://ferma-tolk.youridea.live
+      VITE_MOBILE_AUTH_REDIRECT_URL: fermatolk://auth#recovery
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Ensure CocoaPods
+        run: |
+          if ! command -v pod >/dev/null 2>&1; then
+            sudo gem install cocoapods
+          fi
+      - name: Build web assets
+        run: npm run build
+      - name: Sync iOS shell
+        run: npx cap sync ios
+      - name: Pod install
+        run: cd ios/App && pod install
+      - name: Build iOS app for simulator (unsigned)
+        run: |
+          cd ios/App
+          xcodebuild \
+            -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination "generic/platform=iOS Simulator" \
+            CODE_SIGNING_ALLOWED=NO \
+            build

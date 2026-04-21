@@ -29,6 +29,14 @@ export async function initMobileRuntime() {
 
   let lastBackPress = 0;
 
+  const emitMobileUrlOpen = (url) => {
+    window.dispatchEvent(
+      new CustomEvent('mobile:app-url-open', {
+        detail: { url },
+      })
+    );
+  };
+
   CapacitorApp.addListener('backButton', ({ canGoBack }) => {
     if (canGoBack) {
       window.history.back();
@@ -43,5 +51,22 @@ export async function initMobileRuntime() {
 
     lastBackPress = now;
     alert('Press back again to exit');
+  });
+
+  try {
+    const launch = await CapacitorApp.getLaunchUrl();
+    if (launch?.url) {
+      emitMobileUrlOpen(launch.url);
+    }
+  } catch {
+    // No-op when launch URL is unavailable
+  }
+
+  CapacitorApp.addListener('appUrlOpen', ({ url }) => {
+    if (!url) return;
+
+    // Bridge native URL-open events into the React app.
+    // Auth views listen for this event to process password-recovery links.
+    emitMobileUrlOpen(url);
   });
 }

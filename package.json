@@ -26,7 +26,8 @@
     "mobile:open:android": "npx cap open android",
     "mobile:open:ios": "npx cap open ios",
     "mobile:run:android": "npx cap run android",
-    "mobile:run:ios": "npx cap run ios"
+    "mobile:run:ios": "npx cap run ios",
+    "mobile:android:debug:apk": "bash scripts/mobile/android-build-debug.sh"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.4.3",

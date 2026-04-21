@@ -10,16 +10,19 @@
  *              (entered via URL hash '#recovery' set by Supabase reset email)
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 import { Lock, Mail, ShieldCheck, ArrowRight, CheckCircle } from 'lucide-react';
 import logo from '../../assets/logo.png';
+import { parseAuthCallbackUrl, isRecoveryCallbackUrl } from './authCallback';
 
 const Auth = () => {
-  const { login, register, sendPasswordReset, updatePassword, loading } = useAuth();
+  const { login, register, sendPasswordReset, updatePassword, loading, supabase } = useAuth();
 
   // 'login' | 'register' | 'reset' | 'update'
-  const [mode, setMode] = useState('login');
+  const [mode, setMode] = useState(() =>
+    isRecoveryCallbackUrl(window.location.href) ? 'update' : 'login'
+  );
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -29,21 +32,41 @@ const Auth = () => {
   const [success, setSuccess] = useState('');
   const [busy, setBusy] = useState(false);
 
-  // -------------------------------------------------------------------------
-  // Detect password-recovery token in URL fragment.
-  // Supabase appends #recovery (or ?type=recovery) to the redirect URL
-  // contained in the reset email.  onAuthStateChange fires PASSWORD_RECOVERY
-  // once the SDK exchanges the token for a session — at that point the user
-  // should be shown the "set new password" form.
-  // -------------------------------------------------------------------------
-  useEffect(() => {
-    const hash = window.location.hash;
-    if (hash === '#recovery' || hash.includes('type=recovery')) {
+  const applyAuthCallback = useCallback(
+    async (url) => {
+      const callback = parseAuthCallbackUrl(url);
+      if (!callback?.isRecovery) return;
+
+      if (callback.accessToken && callback.refreshToken) {
+        const { error } = await supabase.auth.setSession({
+          access_token: callback.accessToken,
+          refresh_token: callback.refreshToken,
+        });
+
+        if (error) {
+          setError(error.message || 'Не удалось применить ссылку восстановления');
+          return;
+        }
+      }
+
+      setError('');
+      setSuccess('');
       setMode('update');
-      // Clean fragment so refresh doesn't re-enter update mode after completion
-      window.history.replaceState({}, '', window.location.pathname);
-    }
-  }, []);
+      window.history.replaceState({}, '', `${window.location.pathname}#recovery`);
+    },
+    [supabase]
+  );
+
+  useEffect(() => {
+    const handleMobileUrl = (event) => {
+      const url = event?.detail?.url;
+      if (!url) return;
+      void applyAuthCallback(url);
+    };
+
+    window.addEventListener('mobile:app-url-open', handleMobileUrl);
+    return () => window.removeEventListener('mobile:app-url-open', handleMobileUrl);
+  }, [applyAuthCallback]);
 
   const clearMessages = () => {
     setError('');

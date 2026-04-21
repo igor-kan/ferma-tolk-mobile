@@ -14,9 +14,12 @@
 - [x] Add Android platform (`npx cap add android`).
 - [x] Add iOS platform (`npx cap add ios`).
 - [x] Write architecture and setup documentation.
+- [x] Add native deep-link auth recovery handling (`fermatolk://auth`).
+- [x] Validate Android debug APK build with local SDK + JDK 21.
+- [x] Add native CI workflow for Android APK and iOS simulator builds.
+- [x] Install CocoaPods on host and run full iOS `pod install`.
 
 ## Open / Follow-up
 
-- [ ] Install CocoaPods on macOS and run `npx cap sync ios` with full pod install.
 - [ ] Run on real devices and verify push/keyboard/auth UX behavior.
 - [ ] Add app icons/splash assets for store-ready packaging.

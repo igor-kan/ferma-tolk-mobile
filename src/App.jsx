@@ -158,7 +158,7 @@ function MainApp() {
         setFarmLoading(false);
       })
       .catch(() => setFarmLoading(false));
-  }, [currentUser?.id]);
+  }, [currentUser]);
 
   // ── Loading ───────────────────────────────────────────────────────────────
   if (loading || (currentUser && farmLoading)) {

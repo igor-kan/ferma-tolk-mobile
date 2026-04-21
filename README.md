@@ -64,6 +64,15 @@ npm run mobile:run:android
 npm run mobile:run:ios
 ```
 
+## Build Android APK (Debug)
+
+```bash
+npm run mobile:android:debug:apk
+```
+
+Output:
+- `android/app/build/outputs/apk/debug/app-debug.apk`
+
 ## Environment Variables
 
 Copy and fill:
@@ -75,11 +84,44 @@ Required Supabase keys follow the same pattern as `ferma.tolk`.
 For mobile/native shells, set:
 
 - `VITE_API_BASE_URL=https://ferma-tolk.youridea.live`
+- `VITE_MOBILE_AUTH_REDIRECT_URL=fermatolk://auth#recovery`
 
 This ensures `/api/analytics` and `/api/speech` resolve correctly on Android/iOS.
+The mobile auth redirect enables password-recovery links to open directly in the app.
+
+Add `fermatolk://auth#recovery` to Supabase Auth redirect URL allow-list.
+
+## Linux/Arch Prerequisites
+
+Use JDK 21 for Android builds (JDK 26 is too new for this Gradle setup):
+
+```bash
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk
+export PATH="$JAVA_HOME/bin:$PATH"
+```
+
+Install Android command-line SDK tools (user-local):
+
+```bash
+mkdir -p ~/Android/Sdk/cmdline-tools
+# Download commandlinetools-linux-*_latest.zip and extract into:
+# ~/Android/Sdk/cmdline-tools/latest
+```
+
+Install required Android SDK packages:
+
+```bash
+export ANDROID_HOME=~/Android/Sdk
+export ANDROID_SDK_ROOT=~/Android/Sdk
+export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
+yes | sdkmanager --licenses
+sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+```
 
 ## Notes
 
 - CocoaPods was installed via Ruby gems in this environment.
-- `pod` binary path: `~/.local/share/gem/ruby/3.4.0/bin` (add to PATH).
+- `pod` is available on PATH via `~/.local/bin/pod`.
+- Android and iOS projects include `fermatolk://auth` deep-link handlers for recovery callbacks.
 - iOS native build still requires macOS + Xcode (Linux can prepare/sync but cannot compile/sign iOS apps).
+- Native CI workflow for Android + iOS simulator builds: [mobile-native.yml](/home/igorkan/repos/ferma-tolk-mobile/.github/workflows/mobile-native.yml).

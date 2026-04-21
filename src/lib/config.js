@@ -26,6 +26,7 @@ const _url = import.meta.env.VITE_SUPABASE_URL ?? '';
 const _anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY ?? '';
 const _appEnv = import.meta.env.VITE_APP_ENV || 'local';
 const _apiBase = (import.meta.env.VITE_API_BASE_URL ?? '').trim().replace(/\/+$/, '');
+const _mobileAuthRedirect = (import.meta.env.VITE_MOBILE_AUTH_REDIRECT_URL ?? '').trim();
 const _isDev = import.meta.env.DEV ?? false;
 const _isProd = import.meta.env.PROD ?? false;
 
@@ -74,6 +75,9 @@ export const APP_ENV = _appEnv;
 
 /** Optional absolute API origin for native shells (e.g. https://ferma-tolk.youridea.live). */
 export const API_BASE_URL = _apiBase;
+
+/** Optional mobile auth callback URL (e.g. fermatolk://auth#recovery). */
+export const MOBILE_AUTH_REDIRECT_URL = _mobileAuthRedirect;
 
 /** True when running in Vite development server (HMR). */
 export const IS_DEV = _isDev;
