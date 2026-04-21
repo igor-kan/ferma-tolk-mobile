@@ -1,0 +1,151 @@
+name: Mobile Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_android:
+        description: Build signed Android release artifacts
+        type: boolean
+        required: true
+        default: true
+      run_ios:
+        description: Build signed iOS release artifacts
+        type: boolean
+        required: true
+        default: false
+      upload_testflight:
+        description: Upload iOS build to TestFlight (requires run_ios)
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  android-release:
+    if: ${{ inputs.run_android }}
+    name: Android Signed Release
+    runs-on: ubuntu-latest
+    env:
+      VITE_SUPABASE_URL: https://test.supabase.co
+      VITE_SUPABASE_ANON_KEY: test-anon-key-placeholder
+      VITE_APP_ENV: production
+      VITE_API_BASE_URL: https://ferma-tolk.youridea.live
+      VITE_MOBILE_AUTH_REDIRECT_URL: fermatolk://auth#recovery
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Validate Android signing secrets
+        run: |
+          for key in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            if [ -z "${!key}" ]; then
+              echo "Missing required secret: $key"
+              exit 1
+            fi
+          done
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Android SDK packages
+        run: |
+          export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
+          yes | sdkmanager --licenses
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+      - name: Prepare Android signing files
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/ferma-tolk-release.keystore
+          cat > android/keystore.properties <<EOF
+          storeFile=ferma-tolk-release.keystore
+          storePassword=$ANDROID_KEYSTORE_PASSWORD
+          keyAlias=$ANDROID_KEY_ALIAS
+          keyPassword=$ANDROID_KEY_PASSWORD
+          EOF
+      - name: Build web assets
+        run: npm run build
+      - name: Sync Android shell
+        run: npx cap sync android
+      - name: Build signed Android release
+        run: npm run mobile:android:release
+      - name: Upload Android AAB/APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ferma-tolk-android-release
+          path: |
+            android/app/build/outputs/bundle/release/app-release.aab
+            android/app/build/outputs/apk/release/app-release.apk
+
+  ios-release:
+    if: ${{ inputs.run_ios }}
+    name: iOS Release + TestFlight
+    runs-on: macos-latest
+    env:
+      VITE_SUPABASE_URL: https://test.supabase.co
+      VITE_SUPABASE_ANON_KEY: test-anon-key-placeholder
+      VITE_APP_ENV: production
+      VITE_API_BASE_URL: https://ferma-tolk.youridea.live
+      VITE_MOBILE_AUTH_REDIRECT_URL: fermatolk://auth#recovery
+      APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+      APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+      APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+      MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+      MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+      MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      APP_STORE_TEAM_ID: ${{ secrets.APP_STORE_TEAM_ID }}
+      IOS_BUNDLE_IDENTIFIER: com.fermatolk.mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: ios/App
+      - name: Validate iOS release secrets
+        run: |
+          for key in APP_STORE_CONNECT_KEY_ID APP_STORE_CONNECT_ISSUER_ID APP_STORE_CONNECT_PRIVATE_KEY MATCH_GIT_URL MATCH_PASSWORD APPLE_ID APPLE_TEAM_ID; do
+            if [ -z "${!key}" ]; then
+              echo "Missing required secret: $key"
+              exit 1
+            fi
+          done
+      - name: Install dependencies
+        run: npm ci
+      - name: Build web assets
+        run: npm run build
+      - name: Sync iOS shell
+        run: npx cap sync ios
+      - name: Pod install
+        run: cd ios/App && pod install
+      - name: Install fastlane gems
+        run: cd ios/App && bundle install
+      - name: Build/TestFlight lane
+        run: |
+          cd ios/App
+          if [ "${{ inputs.upload_testflight }}" = "true" ]; then
+            bundle exec fastlane ios beta
+          else
+            bundle exec fastlane ios release_build
+          fi
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ferma-tolk-ios-release
+          path: ios/App/build/FermaTolk.ipa

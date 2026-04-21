@@ -10,8 +10,8 @@ Path: `/home/igorkan/repos/ferma-tolk-mobile`
 - Makes older valid implementations easy to locate, compare, and branch from.
 
 ## Current Snapshot
-- Commit count: 2
-- Latest commit: `496edad` (2026-04-21) Harden mobile parity: native API routing, mic permissions, CocoaPods
+- Commit count: 3
+- Latest commit: `5fa48a5` (2026-04-21) Advance mobile parity and add native build pipeline
 - First commit: `5059796` (2026-04-21) Create Ferma.Tolk mobile repository with Capacitor runtime
 - Primary branch: `main`
 - Known tags: 0
@@ -20,6 +20,7 @@ Path: `/home/igorkan/repos/ferma-tolk-mobile`
 ## Major Version Milestones
 | Date | Commit | Change | Why it matters |
 |---|---|---|---|
+| 2026-04-21 | `5fa48a5` | Advance mobile parity and add native build pipeline | Adds deep-link auth, docs, and native CI baseline |
 | 2026-04-21 | `496edad` | Harden mobile parity: native API routing, mic permissions, CocoaPods | Enables stable native voice/API behavior |
 | 2026-04-21 | `5059796` | Create Ferma.Tolk mobile repository with Capacitor runtime | Notable implementation milestone |
 

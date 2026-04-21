@@ -73,6 +73,41 @@ npm run mobile:android:debug:apk
 Output:
 - `android/app/build/outputs/apk/debug/app-debug.apk`
 
+## Build Android Release (Signed)
+
+```bash
+npm run mobile:android:release
+```
+
+Signing configuration is read from `android/keystore.properties` or from env vars:
+
+- `ANDROID_KEYSTORE_PATH`
+- `ANDROID_KEYSTORE_PASSWORD`
+- `ANDROID_KEY_ALIAS`
+- `ANDROID_KEY_PASSWORD`
+
+Outputs:
+- `android/app/build/outputs/bundle/release/app-release.aab`
+- `android/app/build/outputs/apk/release/app-release.apk`
+
+## iOS Fastlane Lanes (TestFlight)
+
+Fastlane is configured in `ios/App/fastlane`:
+
+- `bundle exec fastlane ios release_build` (signed IPA build only)
+- `bundle exec fastlane ios beta` (build + upload to TestFlight)
+
+Required signing/App Store env vars:
+
+- `APP_STORE_CONNECT_KEY_ID`
+- `APP_STORE_CONNECT_ISSUER_ID`
+- `APP_STORE_CONNECT_PRIVATE_KEY` (base64-encoded key content)
+- `MATCH_GIT_URL`
+- `MATCH_PASSWORD`
+- `APPLE_ID`
+- `APPLE_TEAM_ID`
+- `IOS_BUNDLE_IDENTIFIER` (optional override, defaults to `com.fermatolk.mobile`)
+
 ## Environment Variables
 
 Copy and fill:
@@ -125,3 +160,5 @@ sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 - Android and iOS projects include `fermatolk://auth` deep-link handlers for recovery callbacks.
 - iOS native build still requires macOS + Xcode (Linux can prepare/sync but cannot compile/sign iOS apps).
 - Native CI workflow for Android + iOS simulator builds: [mobile-native.yml](/home/igorkan/repos/ferma-tolk-mobile/.github/workflows/mobile-native.yml).
+- Manual release workflow (signed Android + optional iOS TestFlight): [mobile-release.yml](/home/igorkan/repos/ferma-tolk-mobile/.github/workflows/mobile-release.yml).
+- Native release runbook and secrets reference: [MOBILE-NATIVE-RELEASE.md](/home/igorkan/repos/ferma-tolk-mobile/docs/MOBILE-NATIVE-RELEASE.md).

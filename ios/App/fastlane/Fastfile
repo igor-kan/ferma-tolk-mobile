@@ -1,0 +1,55 @@
+default_platform(:ios)
+
+def require_env!(key)
+  value = ENV[key]
+  UI.user_error!("Missing required env var: #{key}") if value.to_s.empty?
+  value
+end
+
+platform :ios do
+  desc 'Build a signed iOS release artifact (IPA) using match + App Store signing'
+  lane :release_build do
+    api_key = app_store_connect_api_key(
+      key_id: require_env!('APP_STORE_CONNECT_KEY_ID'),
+      issuer_id: require_env!('APP_STORE_CONNECT_ISSUER_ID'),
+      key_content: require_env!('APP_STORE_CONNECT_PRIVATE_KEY'),
+      is_key_content_base64: true
+    )
+
+    match(
+      type: 'appstore',
+      readonly: is_ci,
+      api_key: api_key
+    )
+
+    cocoapods(clean_install: true)
+
+    build_app(
+      workspace: 'App.xcworkspace',
+      scheme: 'App',
+      clean: true,
+      export_method: 'app-store',
+      output_directory: 'build',
+      output_name: 'FermaTolk.ipa'
+    )
+  end
+
+  desc 'Build and upload the iOS app to TestFlight'
+  lane :beta do
+    api_key = app_store_connect_api_key(
+      key_id: require_env!('APP_STORE_CONNECT_KEY_ID'),
+      issuer_id: require_env!('APP_STORE_CONNECT_ISSUER_ID'),
+      key_content: require_env!('APP_STORE_CONNECT_PRIVATE_KEY'),
+      is_key_content_base64: true
+    )
+
+    release_build
+
+    upload_to_testflight(
+      api_key: api_key,
+      ipa: 'build/FermaTolk.ipa',
+      skip_waiting_for_build_processing: true,
+      distribute_external: false
+    )
+  end
+end
