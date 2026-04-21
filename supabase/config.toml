@@ -1,0 +1,66 @@
+# =============================================================================
+# Supabase local development stack configuration
+# Project: Ferma.Tolk
+# Ticket:  FT-004
+# Docs:    https://supabase.com/docs/guides/cli/config
+# =============================================================================
+# To start the local stack:
+#   supabase start
+# To apply migrations + seed:
+#   supabase db reset
+# To stop:
+#   supabase stop
+# =============================================================================
+
+[api]
+# Port for the local PostgREST API
+port = 54321
+# Extra schemas to expose via the API (beyond public and graphql_public)
+schemas = ["public"]
+# Extra schemas for which to generate REST endpoints
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+# Port for the local PostgreSQL instance
+port = 54322
+# Port for pg_dump / psql direct connections
+shadow_port = 54320
+# PostgreSQL major version — must match hosted Supabase (currently 15)
+major_version = 15
+
+[studio]
+# Supabase Studio local UI
+port = 54323
+# API URL used by Studio to reach the local API
+api_url = "http://localhost"
+
+[inbucket]
+# Local email capture server (for auth emails in dev)
+port = 54324
+smtp_port = 54325
+pop3_port = 54326
+
+[storage]
+# Local file storage
+file_size_limit = "50MiB"
+
+[auth]
+site_url = "http://localhost:5173"
+# JWT secret for local dev — NEVER use this value in production
+jwt_expiry = 3600
+# Allow email/password auth
+enable_signup = true
+
+[auth.email]
+enable_confirmations = false  # skip email confirmation in local dev
+
+# ---------------------------------------------------------------------------
+# Environment-specific overrides
+# Use supabase/config.staging.toml and supabase/config.production.toml for
+# staging and production project refs.
+# ---------------------------------------------------------------------------
+
+[experimental]
+# Enable logical replication for realtime subscriptions
+# webhooks = true

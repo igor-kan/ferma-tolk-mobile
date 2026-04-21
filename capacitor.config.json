@@ -1,0 +1,23 @@
+{
+  "appId": "com.fermatolk.mobile",
+  "appName": "Ferma.Tolk Mobile",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 900,
+      "backgroundColor": "#064e3b",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "LIGHT",
+      "backgroundColor": "#064e3b"
+    },
+    "Keyboard": {
+      "resize": "none"
+    }
+  }
+}

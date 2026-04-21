@@ -1,0 +1,37 @@
+[
+  {
+    "crop": "Winter Wheat",
+    "planting_season": "Autumn",
+    "harvest_season": "Summer",
+    "water_need": "Moderate",
+    "soil_type": "Loam"
+  },
+  {
+    "crop": "Corn",
+    "planting_season": "Spring",
+    "harvest_season": "Autumn",
+    "water_need": "High",
+    "soil_type": "Well-drained"
+  },
+  {
+    "crop": "Potatoes",
+    "planting_season": "Spring",
+    "harvest_season": "Late Summer",
+    "water_need": "Medium",
+    "soil_type": "Sandy Loam"
+  },
+  {
+    "crop": "Soybeans",
+    "planting_season": "Late Spring",
+    "harvest_season": "Autumn",
+    "water_need": "Moderate to High",
+    "soil_type": "Clay Loam"
+  },
+  {
+    "crop": "Sunflowers",
+    "planting_season": "Spring",
+    "harvest_season": "Late Summer",
+    "water_need": "Low to Moderate",
+    "soil_type": "Well-drained"
+  }
+]

@@ -1,0 +1,39 @@
+{
+  "crop_categories": [
+    { "category": "Cereals", "examples": ["Wheat", "Corn", "Rice", "Barley"] },
+    { "category": "Legumes", "examples": ["Soybeans", "Lentils", "Peas", "Chickpeas"] },
+    { "category": "Root Crops", "examples": ["Potatoes", "Carrots", "Beets", "Cassava"] },
+    { "category": "Fruit Crops", "examples": ["Tomatoes", "Peppers", "Cucumbers", "Melons"] },
+    { "category": "Leafy Greens", "examples": ["Spinach", "Kale", "Lettuce", "Chard"] },
+    { "category": "Berries", "examples": ["Strawberries", "Blueberries", "Raspberries"] },
+    { "category": "Herbs", "examples": ["Basil", "Cilantro", "Parsley", "Rosemary"] }
+  ],
+  "soil_health_metrics": [
+    "pH Level",
+    "Nitrogen (N)",
+    "Phosphorus (P)",
+    "Potassium (K)",
+    "Organic Matter %",
+    "Moisture Content",
+    "Electrical Conductivity (Salinity)",
+    "Cation Exchange Capacity (CEC)",
+    "Microbial Activity",
+    "Trace Minerals",
+    "Heavy Metal Levels",
+    "Pollution Index"
+  ],
+  "farming_cycles": [
+    "Soil Preparation",
+    "Sowing/Planting",
+    "Irrigation",
+    "Fertilization",
+    "Pest Control",
+    "Harvesting",
+    "Post-Harvest Handling",
+    "Cover Cropping",
+    "Crop Rotation",
+    "Fallout Management",
+    "Winter Storage",
+    "Seed Preservation"
+  ]
+}
