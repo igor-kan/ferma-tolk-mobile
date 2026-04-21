@@ -6,6 +6,7 @@ import { useChatMessages } from './useChatMessages';
 import { usePaginatedTransactions } from '../transactions/useTransactions';
 import { useAuth } from '../auth/AuthContext';
 import { useTaxonomy } from '../taxonomy/useTaxonomy';
+import { buildApiUrl } from '../../shared/api/apiUrl';
 
 import { MessageSquare, Send, Trash2, Mic, MicOff } from 'lucide-react';
 import { filterAssistantTransactions, buildAssistantResponse } from './assistant';
@@ -111,6 +112,16 @@ const Assistant = () => {
 
   // Deepgram-powered voice recognition
   const startVoice = async () => {
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
+      alert(
+        language === 'ru'
+          ? 'Голосовой ввод не поддерживается на этом устройстве'
+          : 'Voice input is not supported on this device'
+      );
+      setIsListening(false);
+      return;
+    }
+
     if (recognitionRef.current && isListening) {
       recognitionRef.current.stop();
       return;
@@ -143,7 +154,7 @@ const Assistant = () => {
           });
 
           const accessToken = session?.access_token;
-          const res = await fetch('/api/speech', {
+          const res = await fetch(buildApiUrl('/api/speech'), {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

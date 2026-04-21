@@ -72,8 +72,14 @@ Copy and fill:
 - `.env.test`
 
 Required Supabase keys follow the same pattern as `ferma.tolk`.
+For mobile/native shells, set:
+
+- `VITE_API_BASE_URL=https://ferma-tolk.youridea.live`
+
+This ensures `/api/analytics` and `/api/speech` resolve correctly on Android/iOS.
 
 ## Notes
 
-- In this environment, iOS `pod install` was skipped because CocoaPods/Xcode are not installed.
-- Android platform scaffolding and Capacitor sync are complete.
+- CocoaPods was installed via Ruby gems in this environment.
+- `pod` binary path: `~/.local/share/gem/ruby/3.4.0/bin` (add to PATH).
+- iOS native build still requires macOS + Xcode (Linux can prepare/sync but cannot compile/sign iOS apps).

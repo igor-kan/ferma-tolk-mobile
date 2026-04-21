@@ -10,6 +10,7 @@ import { useUiContext } from '../ui/UiContext';
 import { useQuery } from '@tanstack/react-query';
 import { useTaxonomy } from '../taxonomy/useTaxonomy';
 import { supabase } from '../../shared/api/supabase';
+import { buildApiUrl } from '../../shared/api/apiUrl';
 import {
   filterTransactionsByPeriod,
   calculateTotals,
@@ -66,7 +67,8 @@ function dbRowToOpexSubCat(r) {
 }
 
 async function fetchAnalyticsFromApi({ accessToken, selectedMonth, selectedYear }) {
-  const res = await fetch(`/api/analytics?month=${selectedMonth}&year=${selectedYear}`, {
+  const endpoint = buildApiUrl(`/api/analytics?month=${selectedMonth}&year=${selectedYear}`);
+  const res = await fetch(endpoint, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
       'Content-Type': 'application/json',

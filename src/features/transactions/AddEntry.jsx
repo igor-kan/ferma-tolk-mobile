@@ -7,6 +7,7 @@ import { t } from '../../i18n';
 import { Mic, Check, X, ArrowUpRight, ArrowDownLeft, Zap, TrendingDown } from 'lucide-react';
 import { validateTransaction, formatValidationErrors } from '../../lib/validators';
 import { parseHeuristics } from './categorization';
+import { buildApiUrl } from '../../shared/api/apiUrl';
 
 const AddEntry = () => {
   const { currentUser } = useAuth();
@@ -76,7 +77,7 @@ const AddEntry = () => {
       });
 
       const accessToken = session?.access_token;
-      const res = await fetch('/api/speech', {
+      const res = await fetch(buildApiUrl('/api/speech'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -138,6 +139,16 @@ const AddEntry = () => {
   }, []);
 
   const handleStartRecording = async () => {
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
+      alert(
+        language === 'ru'
+          ? 'Голосовой ввод не поддерживается на этом устройстве'
+          : 'Voice input is not supported on this device'
+      );
+      setRecordingStep(2);
+      return;
+    }
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream);

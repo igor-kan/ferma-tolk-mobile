@@ -41,7 +41,15 @@ const ALLOWED_MIME_TYPES = new Set([
 ]);
 
 const ALLOWED_ORIGINS = new Set(
-  [APP_ORIGIN, 'http://localhost:5173', 'http://localhost:3000'].filter(Boolean)
+  [
+    APP_ORIGIN,
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://localhost',
+    'https://localhost',
+    'capacitor://localhost',
+    'ionic://localhost',
+  ].filter(Boolean)
 );
 
 function isCorsAllowed(req) {
