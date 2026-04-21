@@ -9,7 +9,7 @@ import { useTaxonomy } from '../taxonomy/useTaxonomy';
 import { buildApiUrl } from '../../shared/api/apiUrl';
 
 import { MessageSquare, Send, Trash2, Mic, MicOff } from 'lucide-react';
-import { filterAssistantTransactions, buildAssistantResponse } from './assistant';
+import { filterAssistantTransactions, buildAssistantResponse } from './assistantService.js';
 
 const Assistant = () => {
   const queryClient = useQueryClient();

@@ -3,7 +3,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { detectPeriod, filterAssistantTransactions } from './assistant.js';
+import { detectPeriod, filterAssistantTransactions } from './assistantService.js';
 
 test('detectPeriod detects current month', () => {
   const now = new Date(2024, 0, 15);

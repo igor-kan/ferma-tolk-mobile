@@ -15,7 +15,7 @@ import { supabaseAdmin } from './_supabase-admin.js';
 import {
   filterAssistantTransactions,
   buildAssistantResponse,
-} from '../src/features/assistant/assistant.js';
+} from '../src/features/assistant/assistantService.js';
 
 export const config = { runtime: 'edge' };
 
