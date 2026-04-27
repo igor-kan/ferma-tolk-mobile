@@ -162,3 +162,48 @@ sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 - Native CI workflow for Android + iOS simulator builds: [mobile-native.yml](/home/igorkan/repos/ferma-tolk-mobile/.github/workflows/mobile-native.yml).
 - Manual release workflow (signed Android + optional iOS TestFlight): [mobile-release.yml](/home/igorkan/repos/ferma-tolk-mobile/.github/workflows/mobile-release.yml).
 - Native release runbook and secrets reference: [MOBILE-NATIVE-RELEASE.md](/home/igorkan/repos/ferma-tolk-mobile/docs/MOBILE-NATIVE-RELEASE.md).
+
+<!-- REPO_ANALYSIS_OVERVIEW_START -->
+## Repository Analysis Snapshot
+
+Generated: 2026-04-21
+
+- Primary stack: Node.js, React, Vite, JavaScript
+- Key paths: `src`, `api`, `public`, `docs`, `scripts`, `.github/workflows`, `README.md`, `package.json`
+- Files scanned (capped): 327
+- Test signal: Test directories detected
+- CI workflows present: Yes
+- GitHub slug: igor-kan/ferma-tolk-mobile
+- GitHub last push: 2026-04-21T17:39:05Z
+
+### Quick Commands
+
+Setup:
+- `npm ci`
+
+Run:
+- `npm run dev`
+- `npm run start`
+
+Quality:
+- `npm run test`
+- `npm run lint`
+- `npm run build`
+
+### Companion Docs
+
+- `AGENTS.md`
+- `TASKS.md`
+- `PLANNING.md`
+- `RESEARCH.md`
+- `PROJECT_BRIEF.md`
+
+### Web Research References
+
+- Origin remote: `https://github.com/igor-kan/ferma-tolk-mobile.git`
+- GitHub homepage: Not set
+- `Node.js: https://nodejs.org/en/docs`
+- `React: https://react.dev`
+- `Vite: https://vite.dev/guide/`
+- `JavaScript: https://developer.mozilla.org/en-US/docs/Web/JavaScript`
+<!-- REPO_ANALYSIS_OVERVIEW_END -->
